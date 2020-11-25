@@ -1,6 +1,3 @@
-
-
-from config import YOUR_API_KEY
 from  dateutil.parser import isoparse
 import matplotlib.pyplot as plt
 
@@ -63,7 +60,7 @@ def create_barplot(results):
     plt.barh(range(len(results)), results.values(), align='center')
     plt.yticks(range(len(results)), list(results.keys()))
     plt.tight_layout()
-    plt.savefig(f"bilder/poll/{pollid}.png")
+    plt.savefig(f"images/poll/{pollid}.png")
 while True:
     results, last_timestamp = append_last_msgs(results, last_timestamp)
     create_barplot(results)
