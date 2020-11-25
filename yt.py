@@ -1,5 +1,8 @@
 from  dateutil.parser import isoparse
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+from matplotlib.ticker import MaxNLocator
+
 
 import difflib
 import requests
@@ -9,27 +12,30 @@ import config
 #CONFIG
 # #
 LIVECHATID = config.LIVECHATID
-YOUR_API_KEY = config.LIVECHATID
+YOUR_API_KEY = config.YOUR_API_KEY
 pollid = config.pollid
 
-
-def append_last_msgs(results, last_timestamp):
-    
+def append_last_msgs(results, last_timestamp):    
     # Get channelID here: 
     # https://developers.google.com/youtube/v3/live/docs/liveBroadcasts/list
     # channelId = "tIIX4_oE27U"
 
     baseurl = f"https://youtube.googleapis.com/youtube/v3/liveChat/messages?liveChatId={LIVECHATID}&part=snippet&key={YOUR_API_KEY}"
-
-    resp = requests.get(baseurl)
-    msgs = resp.json()
-    print("msg count",len(msgs['items']))
     if not last_timestamp:
         last_timestamp = datetime.datetime.utcnow()
         last_timestamp= last_timestamp.replace(tzinfo=datetime.timezone.utc)
         print("Starting timestamp", last_timestamp)
         # last_timestamp = datetime.datetime(2020, 11, 23, 10, 10, tzinfo=datetime.timezone.utc)
     timestamps= [last_timestamp]
+
+    resp = requests.get(baseurl)
+    if not resp.status_code == 200:
+        print(resp)
+        exit
+    msgs = resp.json()
+    print("msg count",len(msgs['items']))   
+
+    
     for msg in msgs["items"]:
         timestamp =isoparse(msg['snippet']['publishedAt'])
         if timestamp > last_timestamp: 
@@ -59,8 +65,13 @@ def create_barplot(results):
     plt.figure(figsize=(4,10))
     plt.barh(range(len(results)), results.values(), align='center')
     plt.yticks(range(len(results)), list(results.keys()))
+
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    
     plt.tight_layout()
     plt.savefig(f"images/poll/{pollid}.png")
+    plt.close()
 while True:
     results, last_timestamp = append_last_msgs(results, last_timestamp)
     create_barplot(results)
