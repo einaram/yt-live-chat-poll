@@ -1,5 +1,8 @@
 # yt-live-chat-poll
 
+
+**Proof of concept/prototype**
+
 Let youtube live chat viewers vote with free text answers and generates a bar chart that can be inserted into Open Broadcast Studio (OBS). 
 Kept up to date when inserted as an image slideshow.
 
